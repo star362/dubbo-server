@@ -1,0 +1,21 @@
+server:
+  port: 0
+spring:
+  application:
+    product: dubbo-demo
+    name: duubbo-consumer
+    env: DEV
+    nacos: 182.92.189.96:8848
+  main:
+    allow-bean-definition-overriding: true
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${spring.application.nacos} # 注册服务地址
+        namespace: ${spring.application.product}
+        group: ${spring.application.env}
+      config:
+        server-addr: ${spring.application.nacos} # 配置服务地址
+        namespace: ${spring.application.product}
+        group: ${spring.application.env}
+        file-extension: yaml

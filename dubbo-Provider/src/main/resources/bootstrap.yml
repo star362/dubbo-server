@@ -1,0 +1,56 @@
+server:
+  port: 0
+spring:
+  application:
+    product: dubbo-demo
+    name: dubbo-Provider
+    env: DEV
+    nacos: 182.92.189.96:8848
+  main:
+    allow-bean-definition-overriding: true
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${spring.application.nacos} # 注册服务地址
+        namespace: ${spring.application.product}
+        group: ${spring.application.env}
+      config:
+        server-addr: ${spring.application.nacos} # 配置服务地址
+        namespace: ${spring.application.product}
+        group: ${spring.application.env}
+        file-extension: yaml
+dubbo:
+  application:
+    id: ${spring.application.name}-dubbo
+    name: ${spring.application.name}-dubbo
+    logger: slf4j
+    # 元数据中心 local 本地 remote 远程 这里使用远程便于其他服务获取
+    metadataType: remote
+    # 可选值 interface、instance、all，默认是 all，即接口级地址、应用级地址都注册
+    register-mode: instance
+    service-discovery:
+      # FORCE_INTERFACE，只消费接口级地址，如无地址则报错，单订阅 2.x 地址
+      # APPLICATION_FIRST，智能决策接口级/应用级地址，双订阅
+      # FORCE_APPLICATION，只消费应用级地址，如无地址则报错，单订阅 3.x 地址
+      migration: FORCE_APPLICATION
+    organization: dubbo-provider
+  protocol:
+    # 设置为 tri 即可使用 Triple 3.0 新协议
+    # 性能对比 dubbo 协议并没有提升 但基于 http2 用于多语言异构等 http 交互场景
+    # 使用 dubbo 协议通信
+    name: dubbo
+    # dubbo 协议端口(-1表示自增端口,从20880开始)
+    port: -1
+    # register: false
+  # 注册中心配置
+  # 消费者相关配置
+  registry:
+    address: nacos://${spring.application.nacos}
+    group: dubboServer
+    parameters:
+      group: dubboServer
+      namespace: ${spring.application.product}
+    id: dubbo-server-registry
+  scan:
+    # 接口实现类扫描
+    base-packages: com.star.dubbo.service
